@@ -1,5 +1,8 @@
-// src/produtos/produtos.service.ts
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateProdutoDto, UpdateProdutoDto } from './produtos.dto';
 
@@ -7,32 +10,56 @@ import { CreateProdutoDto, UpdateProdutoDto } from './produtos.dto';
 export class ProdutosService {
   constructor(private prisma: PrismaService) {}
 
-  create(createProdutoDto: CreateProdutoDto) {
-    return this.prisma.produto.create({
-      data: createProdutoDto,
-    });
+  async create(createProdutoDto: CreateProdutoDto) {
+    try {
+      return await this.prisma.produto.create({
+        data: createProdutoDto,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(`Erro ao criar produto`);
+    }
   }
 
-  findAll() {
-    return this.prisma.produto.findMany();
+  async findAll() {
+    try {
+      return await this.prisma.produto.findMany();
+    } catch (error) {
+      throw new NotFoundException('Erro ao buscar todos os produtos');
+    }
   }
 
-  findOne(id: number) {
-    return this.prisma.produto.findUnique({
-      where: { id },
-    });
+  async findOne(id: number) {
+    try {
+      return await this.prisma.produto.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Produto com ID ${id} não encontrado`);
+    }
   }
 
-  update(id: number, updateProdutoDto: UpdateProdutoDto) {
-    return this.prisma.produto.update({
-      where: { id },
-      data: updateProdutoDto,
-    });
+  async update(id: number, updateProdutoDto: UpdateProdutoDto) {
+    try {
+      return await this.prisma.produto.update({
+        where: { id },
+        data: updateProdutoDto,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Erro ao atualizar o produto com ID ${id}`,
+      );
+    }
   }
 
-  remove(id: number) {
-    return this.prisma.produto.delete({
-      where: { id },
-    });
+  async remove(id: number) {
+    try {
+      return await this.prisma.produto.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Erro ao remover o produto com ID ${id}`,
+      );
+    }
   }
 }

@@ -1,4 +1,3 @@
-// src/produtos/produtos.controller.ts
 import {
   Controller,
   Get,
@@ -7,6 +6,8 @@ import {
   Param,
   Delete,
   Put,
+  NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto, UpdateProdutoDto } from './produtos.dto';
@@ -16,27 +17,54 @@ export class ProdutosController {
   constructor(private readonly produtosService: ProdutosService) {}
 
   @Post()
-  create(@Body() createProdutoDto: CreateProdutoDto) {
-    return this.produtosService.create(createProdutoDto);
+  async create(@Body() createProdutoDto: CreateProdutoDto) {
+    try {
+      return await this.produtosService.create(createProdutoDto);
+    } catch (error) {
+      throw new InternalServerErrorException(`Erro ao criar produto`);
+    }
   }
 
   @Get()
-  findAll() {
-    return this.produtosService.findAll();
+  async findAll() {
+    try {
+      return await this.produtosService.findAll();
+    } catch (error) {
+      throw new NotFoundException('Erro ao buscar todos os produtos');
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.produtosService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      return await this.produtosService.findOne(+id);
+    } catch (error) {
+      throw new NotFoundException(`Produto com id ${id} não encontrado`);
+    }
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
-    return this.produtosService.update(+id, updateProdutoDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateProdutoDto: UpdateProdutoDto,
+  ) {
+    try {
+      return await this.produtosService.update(+id, updateProdutoDto);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Erro ao atualizar o produto com ID ${id}`,
+      );
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.produtosService.remove(+id);
+  async remove(@Param('id') id: string) {
+    try {
+      return await this.produtosService.remove(+id);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Erro ao remover o produto com ID ${id}`,
+      );
+    }
   }
 }
