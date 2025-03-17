@@ -53,9 +53,10 @@ npm install
 cd ../frontend
 npm install
 ```
-### 4. Inicar Banco de Dados: 
+### 4. Configurar e Inicar Banco de Dados: 
 ```bash
 cd ../backend
+mv .env.example .env (Renomeia o arquivo .env.example para .env)
 docker-compose up -d
 ```
 
